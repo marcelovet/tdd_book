@@ -4,11 +4,14 @@ import unittest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.options import Options
 
 
 class NewVisitorTest(unittest.TestCase):
     def setUp(self):
-        self.browser = webdriver.Firefox()
+        options = Options()
+        # options.add_argument("-headless")
+        self.browser = webdriver.Firefox(options=options)
         self.browser.implicitly_wait(3)
 
     def tearDown(self):
@@ -41,21 +44,28 @@ class NewVisitorTest(unittest.TestCase):
         time.sleep(1)
 
         table = self.browser.find_element(By.ID, 'id_list_table')
-        rows = table.find_elements(By.TAG_NAME, 'tr')
-        self.assertTrue(
-            any(row.text == '1: Buy peacock feathers' for row in rows),
-            "New to-do item did not appear in table."
-            f" Contents were:\n{table.text}"
-        )
+        rows = table.find_elements(By.TAG_NAME, 'td')
+        self.assertIn("1: Buy peacock feathers", [row.text for row in rows])
 
         # There is still a text box inviting her to add another item.
         # She enters "Use peacock feathers to make a fly"
         # (Edith is very methodical)
-        self.fail("Finish the test!")
+        input_box = self.browser.find_element(By.ID, 'id_new_item')
+        input_box.send_keys("Use peacock feathers to make a fly")
+        input_box.send_keys(Keys.ENTER)
+        time.sleep(1)
 
         # The page updates again, and now shows both items on her list
+        table = self.browser.find_element(By.ID, 'id_list_table')
+        rows = table.find_elements(By.TAG_NAME, 'td')
+        self.assertIn("1: Buy peacock feathers", [row.text for row in rows])
+        self.assertIn(
+            "2: Use peacock feathers to make a fly",
+            [row.text for row in rows]
+        )
 
         # Satisfied, she goes back to sleep
+        self.fail("Finish the test!")
 
 
 if __name__ == '__main__':
