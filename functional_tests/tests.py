@@ -1,6 +1,7 @@
 import time
 import unittest
 
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
@@ -11,7 +12,7 @@ from selenium.webdriver.firefox.options import Options
 MAX_WAIT = 5
 
 
-class NewVisitorTest(LiveServerTestCase):
+class NewVisitorTest(StaticLiveServerTestCase):
     def setUp(self):
         options = Options()
         # options.add_argument("-headless")
